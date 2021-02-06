@@ -18,7 +18,7 @@ dispatcher = updater.dispatcher
 def start(update, context):
     f = open("chat_ids", "a")
     update.message.reply_text("Bienvenue. Vous seriez notifié(e) à chaque fois qu'Elon Musk tweet à propos de crypto-monnaie.")
-    f.write(str(update.effective_chat.id))
+    f.write(str(update.effective_chat.id) + '\n')
     f.close()
     print("User {} added".format(str(update.effective_chat.id)))
 
@@ -59,7 +59,7 @@ def read_tweets(sc):
                 send_telegram_message_to_all_users("Elon Musk a tweeté : " + tweet.full_text)
                 print("ID: {} notified".format(tweet.id))
                 # Store Tweet ID in file to notify only once
-                f.write(str(tweet.id))
+                f.write(str(tweet.id) + '\n')
 
     f.close()
     s.enter(60, 1, read_tweets, (sc,))

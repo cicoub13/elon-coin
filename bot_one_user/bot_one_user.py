@@ -34,7 +34,7 @@ for tweet in tweets:
             bot.send_message(chat_id = credentials.MY_CHAT_ID, text = "Elon Musk a tweeté : " + tweet.full_text)
             print("ID: {} notified".format(tweet.id))
             # Store Tweet ID in file to notify only once
-            f.write(str(tweet.id))
+            f.write(str(tweet.id) + '\n')
 
 f.close()
         
