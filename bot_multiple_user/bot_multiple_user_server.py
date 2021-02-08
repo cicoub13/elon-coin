@@ -28,13 +28,13 @@ updater.start_polling()
 
 # Function to test if tweet is "interesting"
 def is_tweet_interesting(tweet_text):
-    return "crypto" in tweet_text or "$" in tweet_text
+    return "crypto" in tweet_text or "$" in tweet_text or "coin" in tweet_text
 
 def send_telegram_message_to_all_users(text_message):
     f = open("chat_ids", "r")
     chat_ids = f.read().splitlines()
     for chat_id in chat_ids:
-        bot.send_message(chat_id = chat_id, text = text_message)
+        bot.send_message(chat_id = chat_id, text = text_message, parse_mode = telegram.ParseMode.MARKDOWN)
     f.close()
 
 def read_tweets(sc):
@@ -56,7 +56,7 @@ def read_tweets(sc):
         if str(tweet.id) not in tweets_already_notified:
             if is_tweet_interesting(tweet.full_text):
                 # Notify Telegram user
-                send_telegram_message_to_all_users("Elon Musk a tweeté : " + tweet.full_text)
+                send_telegram_message_to_all_users("*Elon Musk* a tweeté : {} . [Lien Twitter](https://twitter.com/elonmusk/status/{})".format(tweet.full_text, tweet.id))
                 print("ID: {} notified".format(tweet.id))
                 # Store Tweet ID in file to notify only once
                 f.write(str(tweet.id) + '\n')
@@ -66,5 +66,5 @@ def read_tweets(sc):
             
 # Cron
 s = sched.scheduler(time.time, time.sleep)
-s.enter(60, 1, read_tweets, (s,))
+s.enter(10, 1, read_tweets, (s,))
 s.run()
