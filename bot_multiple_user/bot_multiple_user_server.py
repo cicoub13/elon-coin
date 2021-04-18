@@ -34,7 +34,11 @@ def send_telegram_message_to_all_users(text_message):
     f = open("chat_ids", "r")
     chat_ids = f.read().splitlines()
     for chat_id in chat_ids:
-        bot.send_message(chat_id = chat_id, text = text_message, parse_mode = telegram.ParseMode.MARKDOWN)
+        try:
+            bot.send_message(chat_id = chat_id, text = text_message, parse_mode = telegram.ParseMode.MARKDOWN)
+        except telegram.error.Unauthorized as e:
+            print("User {} doesn't want to receive message anymore".format(chat_id))
+            print("Error {}".format(e))
     f.close()
 
 def read_tweets(sc):
@@ -56,8 +60,9 @@ def read_tweets(sc):
         if str(tweet.id) not in tweets_already_notified:
             if is_tweet_interesting(tweet.full_text):
                 # Notify Telegram user
+                print("Tweet id {} to notify".format(tweet.id))
                 send_telegram_message_to_all_users("*Elon Musk* a tweeté : {} . [Lien Twitter](https://twitter.com/elonmusk/status/{})".format(tweet.full_text, tweet.id))
-                print("ID: {} notified".format(tweet.id))
+                
                 # Store Tweet ID in file to notify only once
                 f.write(str(tweet.id) + '\n')
 
@@ -66,5 +71,5 @@ def read_tweets(sc):
             
 # Cron
 s = sched.scheduler(time.time, time.sleep)
-s.enter(10, 1, read_tweets, (s,))
+s.enter(0, 1, read_tweets, (s,))
 s.run()
